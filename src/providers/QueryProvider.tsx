@@ -1,7 +1,7 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 
 export function QueryProvider({ children }: { children: ReactNode }) {
   const [client] = useState(
@@ -17,5 +17,23 @@ export function QueryProvider({ children }: { children: ReactNode }) {
         },
       }),
   );
-  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+  return (
+    <QueryClientProvider client={client}>
+      {children}
+      <Devtools />
+    </QueryClientProvider>
+  );
+}
+
+type DevtoolsComponent = React.ComponentType<{ initialIsOpen?: boolean }>;
+
+function Devtools() {
+  const [Impl, setImpl] = useState<DevtoolsComponent | null>(null);
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'production') return;
+    import('@tanstack/react-query-devtools')
+      .then((m: { ReactQueryDevtools: DevtoolsComponent }) => setImpl(() => m.ReactQueryDevtools))
+      .catch(() => {});
+  }, []);
+  return Impl ? <Impl initialIsOpen={false} /> : null;
 }
