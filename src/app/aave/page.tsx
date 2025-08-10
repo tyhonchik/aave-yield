@@ -1,3 +1,4 @@
+import { ConnectWallet } from '@/components/shared/ConnectWallet';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { Card } from '@/components/ui/card';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -26,6 +27,7 @@ export default async function AavePage() {
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
+            <ConnectWallet />
           </div>
         </header>
         <Card className="overflow-hidden">

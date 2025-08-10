@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { getValidatedEnv } from '@/config/env';
 import { QueryProvider } from '@/providers/QueryProvider';
+import { TestWalletProvider } from '@/providers/TestWalletProvider';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import { WagmiProvider } from '@/providers/WagmiProvider';
 
@@ -47,7 +48,9 @@ html {
           disableTransitionOnChange
         >
           <WagmiProvider env={env}>
-            <QueryProvider>{children}</QueryProvider>
+            <QueryProvider>
+              <TestWalletProvider>{children}</TestWalletProvider>
+            </QueryProvider>
           </WagmiProvider>
         </ThemeProvider>
       </body>

@@ -2,11 +2,13 @@
 
 import { useQuery } from '@tanstack/react-query';
 import type { Market } from '@/config/markets';
+import { usePageVisible } from '@/hooks/use-page-visible';
 
 export function useAaveData(
   markets: Market[],
-  { refreshMs = 20_000 }: { refreshMs?: number } = {},
+  { refreshMs = 30_000 }: { refreshMs?: number } = {},
 ) {
+  const visible = usePageVisible();
   return useQuery({
     queryKey: ['aave', 'apy', markets.map((m) => `${m.chainId}:${m.id}`).join('|')],
     queryFn: async () => {
@@ -15,8 +17,8 @@ export function useAaveData(
       const json = await res.json();
       return json.data;
     },
-    staleTime: refreshMs,
-    refetchInterval: refreshMs,
+    staleTime: 60_000,
+    refetchInterval: visible ? refreshMs : false,
     refetchOnWindowFocus: false,
     retry: 1,
   });
