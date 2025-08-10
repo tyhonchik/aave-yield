@@ -1,0 +1,9 @@
+node_modules
+.next
+build
+out
+.vercel
+.turbo
+**/*.tsbuildinfo
+**/*.min.*
+**/dist/**
