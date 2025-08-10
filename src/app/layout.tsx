@@ -1,6 +1,10 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { getValidatedEnv } from '@/config/env';
+import { QueryProvider } from '@/providers/QueryProvider';
+import { ThemeProvider } from '@/providers/ThemeProvider';
+import { WagmiProvider } from '@/providers/WagmiProvider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -22,9 +26,31 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const env = getValidatedEnv();
+
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <style>{`
+html {
+  font-family: ${geistSans.style.fontFamily};
+  --font-sans: ${geistSans.variable};
+  --font-mono: ${geistMono.variable};
+}
+        `}</style>
+      </head>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <WagmiProvider env={env}>
+            <QueryProvider>{children}</QueryProvider>
+          </WagmiProvider>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

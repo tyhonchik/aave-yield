@@ -20,12 +20,27 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@bgd-labs/aave-address-book": "4.26.2",
+    "@bgd-labs/react-web3-icons": "1.34.0",
+    "@radix-ui/react-slot": "1.2.3",
+    "@radix-ui/react-tooltip": "1.2.7",
+    "@tanstack/react-query": "5.84.2",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "lucide-react": "0.539.0",
     "next": "15.4.4",
+    "next-themes": "0.4.6",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "sonner": "2.0.7",
+    "tailwind-merge": "3.3.1",
+    "viem": "2.33.3",
+    "wagmi": "2.16.2",
+    "zod": "3.25.76"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@ianvs/prettier-plugin-sort-imports": "4.6.0",
     "@secretlint/secretlint-rule-preset-recommend": "10.2.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
@@ -36,12 +51,12 @@
     "eslint": "^9",
     "eslint-config-next": "15.4.4",
     "eslint-config-prettier": "10.1.8",
-    "@ianvs/prettier-plugin-sort-imports": "4.6.0",
     "husky": "9.1.7",
     "lint-staged": "16.1.5",
     "prettier": "3.6.2",
-    "secretlint": "11.0.1",
+    "secretlint": "10.2.2",
     "tailwindcss": "^4",
+    "tw-animate-css": "1.3.6",
     "typescript": "^5"
   },
   "lint-staged": {
