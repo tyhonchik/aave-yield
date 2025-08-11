@@ -44,3 +44,14 @@ export function TokenIndicator({ chainId, symbol, size = 28, className }: TokenI
     </div>
   );
 }
+
+export function AaveIcon({ size = 24, className }: { size?: number; className?: string }) {
+  return (
+    <div
+      className={`inline-flex items-center justify-center shrink-0 ${className ?? ''}`}
+      style={{ width: size, height: size }}
+    >
+      <Web3IconDynamic symbol="AAVE" width={size} height={size} aria-hidden />
+    </div>
+  );
+}
