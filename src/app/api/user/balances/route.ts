@@ -2,7 +2,9 @@ import { type Address } from 'viem';
 import { NextResponse } from 'next/server';
 import { createAllMarketClients, getMarketByChainId } from '@/config/aave-config';
 import { getValidatedEnv } from '@/config/env';
-import { formatTokenBalance, getTokenBalance, getTokenDecimals } from '@/lib/contract-utils';
+import { formatTokenBalance } from '@/lib/contract-utils';
+import { createErrorResponse, createValidationErrorResponse } from '@/lib/error';
+import { fetchTokenBalances } from '@/lib/multicall';
 
 export type TokenBalance = {
   chainId: number;
@@ -24,6 +26,7 @@ async function fetchUserBalances(
   const clients = createAllMarketClients(env);
 
   const balances: TokenBalance[] = [];
+  const criticalErrors: Error[] = [];
 
   const assetsByChain = new Map<number, Address[]>();
   for (const { chainId, asset } of assets) {
@@ -43,25 +46,20 @@ async function fetchUserBalances(
         return;
       }
 
-      await Promise.all(
-        chainAssets.map(async (asset) => {
-          try {
-            const [balance, decimals] = await Promise.all([
-              getTokenBalance(client, asset, userAddress),
-              getTokenDecimals(client, asset),
-            ]);
+      try {
+        const balancesData = await fetchTokenBalances(client, userAddress, chainAssets);
 
-            const formatted = formatTokenBalance(balance, decimals);
+        for (const asset of chainAssets) {
+          const data = balancesData.get(asset);
 
+          if (data) {
             balances.push({
               chainId,
               asset,
-              balance: balance.toString(),
-              formatted,
+              balance: data.balance.toString(),
+              formatted: formatTokenBalance(data.balance, data.decimals),
             });
-          } catch (error) {
-            console.error(`Failed to fetch balance for ${asset} on chain ${chainId}:`, error);
-
+          } else {
             balances.push({
               chainId,
               asset,
@@ -70,10 +68,33 @@ async function fetchUserBalances(
               error: true,
             });
           }
-        }),
-      );
+        }
+      } catch (error) {
+        console.error(`Multicall failed for chain ${chainId}:`, error);
+
+        const err = error as Error;
+        const errorStr = err.toString().toLowerCase();
+
+        if (errorStr.includes('status: 403') || errorStr.includes('status: 401')) {
+          criticalErrors.push(err);
+        }
+
+        for (const asset of chainAssets) {
+          balances.push({
+            chainId,
+            asset,
+            balance: '0',
+            formatted: 'N/A',
+            error: true,
+          });
+        }
+      }
     }),
   );
+
+  if (criticalErrors.length > 0 && balances.filter((b) => !b.error).length === 0) {
+    throw criticalErrors[0];
+  }
 
   return balances;
 }
@@ -89,11 +110,15 @@ export async function POST(request: Request) {
 
     // Validate request body
     if (!body.address || !isValidAddress(body.address)) {
-      return NextResponse.json({ error: 'Invalid or missing address' }, { status: 400 });
+      const { response, status } = createValidationErrorResponse(
+        'Invalid or missing wallet address.',
+      );
+      return NextResponse.json(response, { status });
     }
 
     if (!Array.isArray(body.assets)) {
-      return NextResponse.json({ error: 'Assets must be an array' }, { status: 400 });
+      const { response, status } = createValidationErrorResponse('Assets must be an array.');
+      return NextResponse.json(response, { status });
     }
 
     if (body.assets.length === 0) {
@@ -124,7 +149,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ balances });
   } catch (error) {
     console.error('Balances API Error:', error);
-    return NextResponse.json({ error: 'Failed to fetch balances' }, { status: 500 });
+
+    const { response, status } = createErrorResponse(error);
+
+    return NextResponse.json(response, { status });
   }
 }
 

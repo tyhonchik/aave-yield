@@ -1,19 +1,20 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { Toaster } from '@/components/ui/sonner';
 import { getValidatedEnv } from '@/config/env';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { TestWalletProvider } from '@/providers/TestWalletProvider';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import { WagmiProvider } from '@/providers/WagmiProvider';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const geist = Geist({
+  variable: '--font-sans',
   subsets: ['latin'],
 });
 
 const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+  variable: '--font-mono',
   subsets: ['latin'],
 });
 
@@ -34,13 +35,13 @@ export default function RootLayout({
       <head>
         <style>{`
 html {
-  font-family: ${geistSans.style.fontFamily};
-  --font-sans: ${geistSans.variable};
+  font-family: ${geist.style.fontFamily};
+  --font-sans: ${geist.variable};
   --font-mono: ${geistMono.variable};
 }
         `}</style>
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geist.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -52,6 +53,7 @@ html {
               <TestWalletProvider>{children}</TestWalletProvider>
             </QueryProvider>
           </WagmiProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

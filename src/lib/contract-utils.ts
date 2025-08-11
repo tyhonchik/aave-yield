@@ -1,8 +1,5 @@
 import { formatUnits, type Address, type PublicClient } from 'viem';
-import { ERC20ABI } from './abis/erc20';
-import { PoolABI, type GetReserveDataResult, type GetReservesListResult } from './abis/pool';
-
-// Type-safe wrappers for contract calls
+import { PoolABI, type GetReservesListResult } from './abis/pool';
 
 export async function getReservesList(
   client: PublicClient,
@@ -21,106 +18,6 @@ export async function getReservesList(
   return result as GetReservesListResult;
 }
 
-export async function getReserveData(
-  client: PublicClient,
-  poolAddress: Address,
-  assetAddress: Address,
-): Promise<GetReserveDataResult> {
-  const result = await client.readContract({
-    address: poolAddress,
-    abi: PoolABI,
-    functionName: 'getReserveData',
-    args: [assetAddress],
-  });
-
-  if (!result || typeof result !== 'object') {
-    throw new Error('getReserveData returned invalid data');
-  }
-
-  return result as GetReserveDataResult;
-}
-
-export async function getTokenSymbol(client: PublicClient, tokenAddress: Address): Promise<string> {
-  try {
-    const result = await client.readContract({
-      address: tokenAddress,
-      abi: ERC20ABI,
-      functionName: 'symbol',
-    });
-
-    if (typeof result !== 'string') {
-      return 'UNKNOWN';
-    }
-
-    return result;
-  } catch {
-    return 'UNKNOWN';
-  }
-}
-
-export async function getTokenName(client: PublicClient, tokenAddress: Address): Promise<string> {
-  try {
-    const result = await client.readContract({
-      address: tokenAddress,
-      abi: ERC20ABI,
-      functionName: 'name',
-    });
-
-    if (typeof result !== 'string') {
-      return 'Unknown Token';
-    }
-
-    return result;
-  } catch {
-    return 'Unknown Token';
-  }
-}
-
-export async function getTokenDecimals(
-  client: PublicClient,
-  tokenAddress: Address,
-): Promise<number> {
-  try {
-    const result = await client.readContract({
-      address: tokenAddress,
-      abi: ERC20ABI,
-      functionName: 'decimals',
-    });
-
-    if (typeof result !== 'number' || result < 0 || result > 36) {
-      return 18; // Fallback to 18 decimals
-    }
-
-    return result;
-  } catch {
-    return 18;
-  }
-}
-
-export async function getTokenBalance(
-  client: PublicClient,
-  tokenAddress: Address,
-  userAddress: Address,
-): Promise<bigint> {
-  try {
-    const result = await client.readContract({
-      address: tokenAddress,
-      abi: ERC20ABI,
-      functionName: 'balanceOf',
-      args: [userAddress],
-    });
-
-    if (typeof result !== 'bigint') {
-      return 0n;
-    }
-
-    return result;
-  } catch {
-    return 0n;
-  }
-}
-
-// Utility functions
 export function calculateApy(currentLiquidityRate: bigint): number {
   if (currentLiquidityRate === 0n) {
     return 0;

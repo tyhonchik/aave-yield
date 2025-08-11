@@ -13,35 +13,54 @@ interface MarketRowProps {
   isConnected: boolean;
   isBalancesFetching: boolean;
   balance?: TokenBalance;
+  balancesError?: Error & { code?: string; status?: number };
 }
 
-export function MarketRow({ reserve, isConnected, isBalancesFetching, balance }: MarketRowProps) {
+export function MarketRow({
+  reserve,
+  isConnected,
+  isBalancesFetching,
+  balance,
+  balancesError,
+}: MarketRowProps) {
+  const getApyColor = (apy: number) => {
+    if (apy > 8) return 'text-emerald-600 dark:text-emerald-400';
+    if (apy > 3) return 'text-green-600 dark:text-green-400';
+    return 'text-muted-foreground';
+  };
+
   return (
-    <TableRow key={reserve.id}>
-      <TableCell>
-        <div className="flex flex-col">
-          <span className="font-medium inline-flex items-center gap-2">
-            <ChainIndicator chainId={reserve.chainId} />
-            {reserve.marketName}
-          </span>
-          <div className="mt-0.5 inline-flex items-center gap-1">
-            <Badge variant="secondary">{reserve.chainName}</Badge>
+    <TableRow className="border-t transition-colors hover:bg-muted/40">
+      <TableCell className="px-4 py-3">
+        <div className="flex items-start gap-2">
+          <ChainIndicator chainId={reserve.chainId} />
+          <div className="flex flex-col">
+            <span className="font-medium">{reserve.marketName}</span>
+            <Badge variant="secondary" className="text-xs w-fit">
+              {reserve.chainName}
+            </Badge>
           </div>
         </div>
       </TableCell>
-      <TableCell>
+      <TableCell className="px-4 py-3">
         <span className="inline-flex items-center gap-2">
           <TokenIndicator symbol={reserve.symbol} />
-          {reserve.name}
+          <span className="font-medium">{reserve.name}</span>
         </span>
       </TableCell>
-      <TableCell>{reserve.symbol}</TableCell>
-      <TableCell className="text-right tabular-nums font-semibold">
-        {formatApy(reserve.apy)}
+      <TableCell className="px-4 py-3">{reserve.symbol}</TableCell>
+      <TableCell className="px-4 py-3 text-right">
+        <span className={`tabular-nums font-semibold ${getApyColor(reserve.apy)}`}>
+          {formatApy(reserve.apy)}
+        </span>
       </TableCell>
       {isConnected && (
-        <TableCell className="text-right tabular-nums min-w-[4rem]">
-          <BalanceCell isLoading={isBalancesFetching} balance={balance} />
+        <TableCell className="px-4 py-3 text-right tabular-nums min-w-[4rem]">
+          <BalanceCell
+            isLoading={isBalancesFetching}
+            balance={balance}
+            balancesError={balancesError}
+          />
         </TableCell>
       )}
     </TableRow>

@@ -1,16 +1,20 @@
 'use client';
 
+import { RefreshCw, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { AutoRefreshInfo } from './AutoRefreshInfo';
 
 interface TableControlsProps {
   query: string;
   onQueryChange: (query: string) => void;
   onRefresh: () => void;
   isFetching: boolean;
-  hasBalanceErrors: boolean;
-  isConnected: boolean;
+  autoRefreshEnabled: boolean;
+  onToggleAutoRefresh: () => void;
+  lastUpdated?: number;
+  refreshInterval: number;
+  staleTime?: number;
 }
 
 export function TableControls({
@@ -18,36 +22,47 @@ export function TableControls({
   onQueryChange,
   onRefresh,
   isFetching,
-  hasBalanceErrors,
-  isConnected,
+  autoRefreshEnabled,
+  onToggleAutoRefresh,
+  lastUpdated,
+  refreshInterval,
+  staleTime,
 }: TableControlsProps) {
   return (
-    <div className="mb-3 mt-2 flex flex-col gap-2 md:mb-4 md:flex-row md:items-end md:justify-between">
-      <div className="relative w-full sm:max-w-md">
-        <Input
-          value={query}
-          onChange={(e) => onQueryChange(e.target.value)}
-          placeholder="Search by asset, symbol, or chain..."
-          aria-label="Search"
-        />
+    <div className="mb-3 mt-12 flex flex-col gap-2 md:mb-4 md:flex-row md:items-end md:justify-between">
+      <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="relative w-full sm:max-w-md">
+          <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            disabled={isFetching}
+            value={query}
+            onChange={(e) => onQueryChange(e.target.value)}
+            className="pl-8"
+            placeholder="Search by asset, symbol, or chain..."
+          />
+        </div>
       </div>
-      <div className="flex items-center gap-2">
-        {hasBalanceErrors && isConnected && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="text-destructive text-sm">Balance errors</div>
-            </TooltipTrigger>
-            <TooltipContent>Some balances failed to load</TooltipContent>
-          </Tooltip>
-        )}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="outline" size="sm" onClick={onRefresh} disabled={isFetching}>
-              {isFetching ? 'Updating…' : 'Refresh'}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Manual refresh</TooltipContent>
-        </Tooltip>
+
+      <div className="flex items-end gap-2">
+        <AutoRefreshInfo
+          autoRefreshEnabled={autoRefreshEnabled}
+          onToggleAutoRefresh={onToggleAutoRefresh}
+          isFetching={isFetching}
+          lastUpdated={lastUpdated}
+          refreshInterval={refreshInterval}
+          staleTime={staleTime}
+        />
+
+        <Button
+          disabled={isFetching}
+          variant="outline"
+          size="sm"
+          className="gap-1 bg-transparent"
+          onClick={onRefresh}
+        >
+          <RefreshCw className="h-4 w-4" />
+          Refresh
+        </Button>
       </div>
     </div>
   );

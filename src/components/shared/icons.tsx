@@ -18,25 +18,29 @@ const Web3IconDynamic = dynamic<Web3IconProps>(
 
 export function ChainIndicator({ chainId, size = 16, className }: ChainIconProps) {
   return (
-    <Web3IconDynamic
-      chainId={chainId}
-      width={size}
-      height={size}
-      className={className}
-      aria-hidden
-    />
+    <div
+      className={`inline-flex items-center justify-center shrink-0 self-center ${className ?? ''}`}
+      style={{ width: size, height: size }}
+    >
+      <Web3IconDynamic chainId={chainId} width={size} height={size} aria-hidden />
+    </div>
   );
 }
 
-export function TokenIndicator({ chainId, symbol, size = 18, className }: TokenIconProps) {
+export function TokenIndicator({ chainId, symbol, size = 28, className }: TokenIconProps) {
   return (
-    <Web3IconDynamic
-      chainId={chainId}
-      symbol={symbol}
-      width={size}
-      height={size}
-      className={className}
-      aria-hidden
-    />
+    <div
+      className={`inline-flex items-center justify-center shrink-0 rounded-md bg-background text-xs shadow-sm ring-1 ring-black/5 dark:ring-white/10 ${className}`}
+      style={{ width: size, height: size }}
+    >
+      <Web3IconDynamic
+        chainId={chainId}
+        symbol={symbol}
+        width={size}
+        height={size}
+        aria-hidden
+        className="rounded-md"
+      />
+    </div>
   );
 }

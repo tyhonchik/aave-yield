@@ -24,7 +24,7 @@ export function SortableTableHeader({
 
   return (
     <TableHead
-      className={`group text-sm font-medium text-muted-foreground select-none ${cursor}`}
+      className={`group px-4 py-2 text-sm font-medium text-muted-foreground select-none bg-muted/50 ${cursor}`}
       onClick={onClick}
       tabIndex={onClick ? 0 : undefined}
       onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onClick?.()}
@@ -33,8 +33,10 @@ export function SortableTableHeader({
       <div className={`flex items-center ${justify} gap-1`}>
         <span>{label}</span>
         {onClick && (
-          <span className="text-xs text-muted-foreground/50">
-            {active ? (dir === 'desc' ? '↓' : '↑') : '↕'}
+          <span
+            className={`text-xs transition-opacity ${active ? 'opacity-100' : 'opacity-0 group-hover:opacity-60'}`}
+          >
+            {dir === 'desc' ? '↓' : '↑'}
           </span>
         )}
       </div>

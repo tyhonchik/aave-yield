@@ -10,8 +10,6 @@ type TestWalletOption = {
 };
 
 const TEST_WALLETS: TestWalletOption[] = [
-  { label: 'Wallet A', address: '0x28a55C4b4f9615FDE3CDAdDf6cc01FcE2E38A6b0' },
-  { label: 'Wallet B', address: '0x9bC4b8E2F5fD0a3C4F1e9B0Ac0b1Ff2e8C4b1a22' },
   { label: 'Wallet C', address: '0x01CB1D7f983150Bff188Bafe89f7AC47432bB645' },
   { label: 'Wallet D', address: '0x1111222233334444555566667777888899990000' },
 ];

@@ -1,7 +1,9 @@
+export { AutoRefreshInfo } from './AutoRefreshInfo';
 export { BalanceCell } from './BalanceCell';
+export { TableControls } from './TableControls';
 export { ErrorState } from './ErrorState';
 export { LoadingState } from './LoadingState';
 export { MarketRow } from './MarketRow';
+export { MarketErrorRow } from './MarketErrorRow';
 export { MarketTableHeader } from './MarketTableHeader';
 export { SortableTableHeader } from './SortableTableHeader';
-export { TableControls } from './TableControls';

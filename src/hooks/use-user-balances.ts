@@ -3,6 +3,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { type Address } from 'viem';
 import { useAccount } from 'wagmi';
+import { QUERY_CONFIG } from '@/config/query-config';
+import { apiRequestJSON, shouldRetryRequest } from '@/lib/fetch';
 import { useTestWallet } from '@/providers/TestWalletProvider';
 
 export type TokenBalance = {
@@ -23,7 +25,10 @@ export type AssetIdentifier = {
 /**
  * Hook for fetching user balances for specified assets
  */
-export function useUserBalances(assets: AssetIdentifier[], { refetchInterval = 45000 } = {}) {
+export function useUserBalances(
+  assets: AssetIdentifier[],
+  { refetchInterval = QUERY_CONFIG.BALANCES_REFRESH_INTERVAL } = {},
+) {
   // Try test wallet first, then real wallet
   const testWallet = useTestWallet();
   const { address: realAddress } = useAccount();
@@ -36,7 +41,7 @@ export function useUserBalances(assets: AssetIdentifier[], { refetchInterval = 4
         return new Map();
       }
 
-      const response = await fetch('/api/user/balances', {
+      const data = await apiRequestJSON<{ balances: TokenBalance[] }>('/api/user/balances', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,16 +55,10 @@ export function useUserBalances(assets: AssetIdentifier[], { refetchInterval = 4
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch balances');
-      }
-
-      const data = await response.json();
-
       // Convert to Map for easy lookup
       const balanceMap = new Map<string, TokenBalance>();
 
-      if (data.balances) {
+      if (data.balances && Array.isArray(data.balances)) {
         for (const balance of data.balances) {
           const key = `${balance.chainId}-${balance.asset.toLowerCase()}`;
           balanceMap.set(key, balance);
@@ -69,9 +68,10 @@ export function useUserBalances(assets: AssetIdentifier[], { refetchInterval = 4
       return balanceMap;
     },
     enabled: Boolean(address && assets.length > 0),
-    staleTime: 30000,
+    staleTime: QUERY_CONFIG.BALANCES_STALE_TIME,
     refetchInterval,
     refetchOnWindowFocus: false,
+    retry: shouldRetryRequest,
   });
 }
 

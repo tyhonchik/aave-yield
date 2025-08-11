@@ -2,14 +2,9 @@ import { type Address } from 'viem';
 import { NextResponse } from 'next/server';
 import { createAllMarketClients, getEnabledMarkets } from '@/config/aave-config';
 import { getValidatedEnv } from '@/config/env';
-import {
-  calculateApy,
-  getReserveData,
-  getReservesList,
-  getTokenDecimals,
-  getTokenName,
-  getTokenSymbol,
-} from '@/lib/contract-utils';
+import { calculateApy, getReservesList } from '@/lib/contract-utils';
+import { AppError, createErrorResponse } from '@/lib/error';
+import { fetchReservesData, fetchTokensMetadata } from '@/lib/multicall';
 
 export type MarketReserve = {
   id: string;
@@ -23,69 +18,111 @@ export type MarketReserve = {
   apy: number;
 };
 
-async function fetchMarketData() {
+export type MarketError = {
+  id: string;
+  chainId: number;
+  chainName: string;
+  marketName: string;
+  error: string;
+  retryable: boolean;
+};
+
+async function fetchMarketData(): Promise<{ markets: MarketReserve[]; errors: MarketError[] }> {
   const env = getValidatedEnv();
   const enabledMarkets = getEnabledMarkets();
   const clients = createAllMarketClients(env);
 
   const allReserves: MarketReserve[] = [];
+  const marketErrors: MarketError[] = [];
 
   // Process each market in parallel
   await Promise.all(
     enabledMarkets.map(async (market) => {
       const client = clients[market.chainId];
-      if (!client) return;
+      if (!client) {
+        marketErrors.push({
+          id: `market-${market.chainId}`,
+          chainId: market.chainId,
+          chainName: market.chainName,
+          marketName: market.label,
+          error: 'No client available for this chain',
+          retryable: true,
+        });
+        return;
+      }
 
       try {
         const reserves = await getReservesList(client, market.pool);
+        const assets = Array.from(reserves);
 
-        // Process each reserve
-        await Promise.all(
-          reserves.map(async (asset) => {
-            try {
-              const [reserveData, symbol, name, decimals] = await Promise.all([
-                getReserveData(client, market.pool, asset),
-                getTokenSymbol(client, asset),
-                getTokenName(client, asset),
-                getTokenDecimals(client, asset),
-              ]);
+        const [reservesData, tokensMetadata] = await Promise.all([
+          fetchReservesData(client, market.pool, assets),
+          fetchTokensMetadata(client, assets),
+        ]);
 
-              const apy = calculateApy(reserveData.currentLiquidityRate);
+        for (const asset of assets) {
+          const reserveData = reservesData.get(asset);
+          const metadata = tokensMetadata.get(asset);
 
-              allReserves.push({
-                id: `${market.chainId}-${asset}`,
-                chainId: market.chainId,
-                chainName: market.chainName,
-                marketName: market.label,
-                asset,
-                symbol,
-                name,
-                decimals,
-                apy,
-              });
-            } catch (error) {
-              console.error(`Failed to process asset ${asset} in ${market.label}:`, error);
-            }
-          }),
-        );
+          if (!reserveData || !metadata) {
+            marketErrors.push({
+              id: `asset-${market.chainId}-${asset}`,
+              chainId: market.chainId,
+              chainName: market.chainName,
+              marketName: `${market.label} - ${asset.slice(0, 6)}...${asset.slice(-4)}`,
+              error: 'Failed to fetch asset data',
+              retryable: true,
+            });
+            continue;
+          }
+
+          allReserves.push({
+            id: `${market.chainId}-${asset}`,
+            chainId: market.chainId,
+            chainName: market.chainName,
+            marketName: market.label,
+            asset,
+            symbol: metadata.symbol,
+            name: metadata.name,
+            decimals: metadata.decimals,
+            apy: calculateApy(reserveData.currentLiquidityRate),
+          });
+        }
       } catch (error) {
-        console.error(`Failed to fetch reserves for ${market.label}:`, error);
+        console.error(`Market ${market.label} failed:`, error);
+
+        const appError = AppError.fromUnknown(error);
+
+        marketErrors.push({
+          id: `market-${market.chainId}`,
+          chainId: market.chainId,
+          chainName: market.chainName,
+          marketName: market.label,
+          error: appError.userMessage,
+          retryable: appError.retryable,
+        });
       }
     }),
   );
 
+  if (allReserves.length === 0 && marketErrors.length > 0) {
+    throw AppError.server('No market data available');
+  }
+
   allReserves.sort((a, b) => b.apy - a.apy);
 
-  return allReserves;
+  return { markets: allReserves, errors: marketErrors };
 }
 
 export async function GET() {
   try {
-    const markets = await fetchMarketData();
-    return NextResponse.json({ markets });
+    const result = await fetchMarketData();
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Markets API Error:', error);
-    return NextResponse.json({ error: 'Failed to fetch market data' }, { status: 500 });
+
+    const { response, status } = createErrorResponse(error);
+    return NextResponse.json(response, { status });
   }
 }
 

@@ -100,7 +100,7 @@ export function getSupportedChainIds(): number[] {
 export function createMarketClient(market: AaveMarketConfig, env: Env): PublicClient {
   return createPublicClient({
     chain: market.chain,
-    transport: http(market.getRpcUrl(env), { batch: true }),
+    transport: http(market.getRpcUrl(env), { batch: false }),
   });
 }
 
@@ -126,7 +126,7 @@ export function createWagmiTransports(env: Env) {
   const transports: Record<number, ReturnType<typeof http>> = {};
 
   for (const market of getEnabledMarkets()) {
-    transports[market.chainId] = http(market.getRpcUrl(env), { batch: true });
+    transports[market.chainId] = http(market.getRpcUrl(env), { batch: false });
   }
 
   return transports;

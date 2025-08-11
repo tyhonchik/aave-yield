@@ -2,6 +2,8 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { type Address } from 'viem';
+import { QUERY_CONFIG } from '@/config/query-config';
+import { apiRequestJSON, shouldRetryRequest } from '@/lib/fetch';
 
 export type MarketReserve = {
   id: string;
@@ -15,20 +17,37 @@ export type MarketReserve = {
   apy: number;
 };
 
-export function useAaveMarkets({ refetchInterval = 30000 } = {}) {
+export type MarketError = {
+  id: string;
+  chainId: number;
+  chainName: string;
+  marketName: string;
+  error: string;
+  retryable: boolean;
+};
+
+export function useAaveMarkets({
+  refetchInterval = QUERY_CONFIG.MARKETS_REFRESH_INTERVAL,
+}: { refetchInterval?: number | false } = {}) {
   return useQuery({
     queryKey: ['aave-markets'],
-    queryFn: async (): Promise<MarketReserve[]> => {
-      const response = await fetch('/api/aave/markets');
-      if (!response.ok) {
-        throw new Error('Failed to fetch market data');
+    queryFn: async (): Promise<{ markets: MarketReserve[]; errors: MarketError[] }> => {
+      const data = await apiRequestJSON<{ markets: MarketReserve[]; errors: MarketError[] }>(
+        '/api/aave/markets',
+      );
+
+      if (!data.markets || !Array.isArray(data.markets)) {
+        throw new Error('Invalid response format from server');
       }
 
-      const data = await response.json();
-      return data.markets;
+      return {
+        markets: data.markets,
+        errors: data.errors || [],
+      };
     },
-    staleTime: 15000,
+    staleTime: QUERY_CONFIG.MARKETS_STALE_TIME,
     refetchInterval,
     refetchOnWindowFocus: false,
+    retry: shouldRetryRequest,
   });
 }

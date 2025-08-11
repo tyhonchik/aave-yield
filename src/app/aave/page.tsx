@@ -1,8 +1,7 @@
 import { ConnectWallet } from '@/components/shared/ConnectWallet';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
-import { Card } from '@/components/ui/card';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import ApyTable from './table-client';
+import ApyTable from './ApyTable';
 
 export default function AavePage() {
   return (
@@ -25,9 +24,8 @@ export default function AavePage() {
             <ConnectWallet />
           </div>
         </header>
-        <Card className="overflow-hidden">
-          <ApyTable />
-        </Card>
+
+        <ApyTable />
       </main>
     </TooltipProvider>
   );
