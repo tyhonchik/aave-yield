@@ -22,7 +22,7 @@ export function MobileMarketErrorCard({ error, onRetry }: MobileMarketErrorCardP
             <div className="text-sm text-muted-foreground mb-1">
               {error.marketName} on {error.chainName}
             </div>
-            <div className="text-xs text-destructive mb-2 break-words">{error.message}</div>
+            <div className="text-xs text-destructive mb-2 break-words">{error.error}</div>
             <Button variant="outline" size="sm" onClick={onRetry} className="gap-1 h-7">
               <RefreshCw className="h-3 w-3" />
               Retry
