@@ -47,7 +47,7 @@ export function AutoRefreshInfo({
     : '—';
 
   return (
-    <div className="flex flex-col items-end gap-1">
+    <div className="flex flex-col items-end gap-0.5 text-right">
       <Tooltip>
         <TooltipTrigger asChild>
           <button
@@ -59,8 +59,8 @@ export function AutoRefreshInfo({
           >
             {autoRefreshEnabled
               ? secondsLeft > 0
-                ? `Autorefresh in ${secondsLeft} seconds`
-                : 'Data is stale, refreshing soon...'
+                ? `Autorefresh in ${secondsLeft}s`
+                : 'Refreshing soon...'
               : 'Autorefresh off'}
           </button>
         </TooltipTrigger>
@@ -74,14 +74,14 @@ export function AutoRefreshInfo({
       <div className="flex items-center gap-1">
         {!isFetching && (
           <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-            <Clock className="h-3.5 w-3.5" />
-            Last updated {formattedTime}
+            <Clock className="h-3 w-3" />
+            {formattedTime}
           </span>
         )}
         {isFetching && (
           <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            updating...
+            <Loader2 className="h-3 w-3 animate-spin" />
+            updating
           </span>
         )}
       </div>

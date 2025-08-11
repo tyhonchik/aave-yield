@@ -29,9 +29,10 @@ export function TableControls({
   staleTime,
 }: TableControlsProps) {
   return (
-    <div className="mb-3 mt-12 flex flex-col gap-2 md:mb-4 md:flex-row md:items-end md:justify-between">
-      <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
-        <div className="relative w-full sm:max-w-md">
+    <div className="mb-4 mt-8 md:mt-12 space-y-3 md:space-y-0 md:flex md:items-end md:justify-between">
+      {/* Search Input */}
+      <div className="flex-1">
+        <div className="relative w-full md:max-w-md">
           <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             disabled={isFetching}
@@ -43,7 +44,8 @@ export function TableControls({
         </div>
       </div>
 
-      <div className="flex items-end gap-2">
+      {/* Controls */}
+      <div className="flex items-center gap-2">
         <AutoRefreshInfo
           autoRefreshEnabled={autoRefreshEnabled}
           onToggleAutoRefresh={onToggleAutoRefresh}
@@ -57,11 +59,11 @@ export function TableControls({
           disabled={isFetching}
           variant="outline"
           size="sm"
-          className="gap-1 bg-transparent"
+          className="gap-1.5 bg-transparent w-8 h-8 p-0 sm:w-auto sm:h-auto sm:px-3 sm:py-2"
           onClick={onRefresh}
         >
           <RefreshCw className="h-4 w-4" />
-          Refresh
+          <span className="hidden sm:inline">Refresh</span>
         </Button>
       </div>
     </div>

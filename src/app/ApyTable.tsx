@@ -8,6 +8,8 @@ import {
   MarketErrorRow,
   MarketRow,
   MarketTableHeader,
+  MobileMarketCard,
+  MobileMarketErrorCard,
   TableControls,
 } from '@/components/table';
 import { Card } from '@/components/ui/card';
@@ -93,52 +95,79 @@ export default function ApyTable() {
         staleTime={QUERY_CONFIG.MARKETS_STALE_TIME}
       />
 
-      <Card className="overflow-hidden py-0">
-        <div className="hidden md:block">
-          <div className="overflow-x-auto">
-            <Table>
-              <MarketTableHeader
-                sortKey={sortKey}
-                sortDir={sortDir}
-                onSort={toggleSort}
-                isConnected={isConnected}
-              />
-              <TableBody
-                className={isFetching ? 'transition-opacity opacity-50' : 'transition-opacity'}
-              >
-                {sortedItems.map((reserve) => (
-                  <MarketRow
-                    key={reserve.id}
-                    reserve={reserve}
-                    isConnected={isConnected}
-                    isBalancesFetching={isBalancesFetching}
-                    balance={getAssetBalance(balances, reserve.chainId, reserve.asset)}
-                    balancesError={balancesError as AppError | undefined}
-                  />
-                ))}
-                {marketErrors.map((error) => (
-                  <MarketErrorRow
-                    key={error.id}
-                    error={error}
-                    isConnected={isConnected}
-                    onRetry={() => refetch()}
-                  />
-                ))}
-                {sortedItems.length === 0 && marketErrors.length === 0 && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={isConnected ? 5 : 4}
-                      className="py-6 text-center text-muted-foreground"
-                    >
-                      No results
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+      <Card className="overflow-hidden py-0 hidden md:block">
+        <div className="overflow-x-auto">
+          <Table>
+            <MarketTableHeader
+              sortKey={sortKey}
+              sortDir={sortDir}
+              onSort={toggleSort}
+              isConnected={isConnected}
+            />
+            <TableBody
+              className={isFetching ? 'transition-opacity opacity-50' : 'transition-opacity'}
+            >
+              {sortedItems.map((reserve) => (
+                <MarketRow
+                  key={reserve.id}
+                  reserve={reserve}
+                  isConnected={isConnected}
+                  isBalancesFetching={isBalancesFetching}
+                  balance={getAssetBalance(balances, reserve.chainId, reserve.asset)}
+                  balancesError={balancesError as AppError | undefined}
+                />
+              ))}
+              {marketErrors.map((error) => (
+                <MarketErrorRow
+                  key={error.id}
+                  error={error}
+                  isConnected={isConnected}
+                  onRetry={() => refetch()}
+                />
+              ))}
+              {sortedItems.length === 0 && marketErrors.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={isConnected ? 5 : 4}
+                    className="py-6 text-center text-muted-foreground"
+                  >
+                    No results
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </div>
       </Card>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden">
+        <div className={isFetching ? 'transition-opacity opacity-50' : 'transition-opacity'}>
+          {sortedItems.map((reserve) => (
+            <MobileMarketCard
+              key={reserve.id}
+              reserve={reserve}
+              isConnected={isConnected}
+              isBalancesFetching={isBalancesFetching}
+              balance={getAssetBalance(balances, reserve.chainId, reserve.asset)}
+              balancesError={balancesError as AppError | undefined}
+            />
+          ))}
+          {marketErrors.map((error) => (
+            <MobileMarketErrorCard
+              key={error.id}
+              error={error}
+              isConnected={isConnected}
+              onRetry={() => refetch()}
+            />
+          ))}
+          {sortedItems.length === 0 && marketErrors.length === 0 && (
+            <Card>
+              <div className="py-12 text-center text-muted-foreground">No results</div>
+            </Card>
+          )}
+        </div>
+      </div>
     </TooltipProvider>
   );
 }

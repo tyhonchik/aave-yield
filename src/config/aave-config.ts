@@ -1,6 +1,12 @@
-import { AaveV3Base, AaveV3Ethereum, AaveV3Polygon } from '@bgd-labs/aave-address-book';
+import {
+  AaveV3Arbitrum,
+  AaveV3Base,
+  AaveV3Ethereum,
+  AaveV3Optimism,
+  AaveV3Polygon,
+} from '@bgd-labs/aave-address-book';
 import { createPublicClient, http, type Address, type PublicClient } from 'viem';
-import { base, mainnet, polygon, type Chain } from 'viem/chains';
+import { arbitrum, base, mainnet, optimism, polygon, type Chain } from 'viem/chains';
 import type { Env } from './env';
 
 // Main config for all chains and markets
@@ -76,6 +82,34 @@ export const AAVE_MARKETS: AaveMarketConfig[] = [
     pool: AaveV3Base.POOL,
     addressesProvider: AaveV3Base.POOL_ADDRESSES_PROVIDER,
     uiPoolDataProvider: AaveV3Base.UI_POOL_DATA_PROVIDER,
+    enabled: true,
+  },
+  {
+    id: 'arb-v3',
+    label: 'Aave V3 Arbitrum',
+    chainId: arbitrum.id,
+    chain: arbitrum,
+    chainName: 'Arbitrum',
+    nativeSymbol: 'ETH',
+    explorerBaseUrl: 'https://arbiscan.io',
+    getRpcUrl: (env) => env.RPC_ARBITRUM,
+    pool: AaveV3Arbitrum.POOL,
+    addressesProvider: AaveV3Arbitrum.POOL_ADDRESSES_PROVIDER,
+    uiPoolDataProvider: AaveV3Arbitrum.UI_POOL_DATA_PROVIDER,
+    enabled: true,
+  },
+  {
+    id: 'opt-v3',
+    label: 'Aave V3 Optimism',
+    chainId: optimism.id,
+    chain: optimism,
+    chainName: 'Optimism',
+    nativeSymbol: 'ETH',
+    explorerBaseUrl: 'https://optimistic.etherscan.io',
+    getRpcUrl: (env) => env.RPC_OPTIMISM,
+    pool: AaveV3Optimism.POOL,
+    addressesProvider: AaveV3Optimism.POOL_ADDRESSES_PROVIDER,
+    uiPoolDataProvider: AaveV3Optimism.UI_POOL_DATA_PROVIDER,
     enabled: true,
   },
 ] as const;

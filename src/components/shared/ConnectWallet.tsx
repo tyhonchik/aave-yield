@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTestWallet } from '@/providers/TestWalletProvider';
 
 type TestWalletOption = {
@@ -38,13 +39,22 @@ export function ConnectWallet() {
 
   if (isConnected && address) {
     return (
-      <div className="flex items-center gap-2">
-        <div className="rounded-md border px-2 py-1 text-xs font-mono">
-          {address.slice(0, 6)}...{address.slice(-4)}
+      <div className="flex flex-col items-end gap-1">
+        <div className="flex items-center gap-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="rounded-md border px-2 py-1 text-xs font-mono cursor-help">
+                {address.slice(0, 6)}...{address.slice(-4)}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="font-mono text-xs">{address}</p>
+            </TooltipContent>
+          </Tooltip>
+          <Button variant="outline" size="sm" onClick={() => disconnect()}>
+            Disconnect
+          </Button>
         </div>
-        <Button variant="outline" size="sm" onClick={() => disconnect()}>
-          Disconnect
-        </Button>
       </div>
     );
   }

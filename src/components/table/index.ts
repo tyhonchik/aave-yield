@@ -7,3 +7,5 @@ export { MarketRow } from './MarketRow';
 export { MarketErrorRow } from './MarketErrorRow';
 export { MarketTableHeader } from './MarketTableHeader';
 export { SortableTableHeader } from './SortableTableHeader';
+export { MobileMarketCard } from './MobileMarketCard';
+export { MobileMarketErrorCard } from './MobileMarketErrorCard';
