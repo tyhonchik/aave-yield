@@ -2,14 +2,9 @@ import { ConnectWallet } from '@/components/shared/ConnectWallet';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { Card } from '@/components/ui/card';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { getValidatedEnv } from '@/config/env';
-import { MARKETS } from '@/config/markets';
-import { getAllMarketsApy } from '@/data/aave/queries';
 import ApyTable from './table-client';
 
-export default async function AavePage() {
-  const env = getValidatedEnv();
-  const initialData = await getAllMarketsApy(env, MARKETS);
+export default function AavePage() {
   return (
     <TooltipProvider>
       <main className="mx-auto max-w-6xl px-4 py-6 md:py-8">
@@ -31,7 +26,7 @@ export default async function AavePage() {
           </div>
         </header>
         <Card className="overflow-hidden">
-          <ApyTable initialData={initialData} />
+          <ApyTable />
         </Card>
       </main>
     </TooltipProvider>

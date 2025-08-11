@@ -1,16 +1,14 @@
-import type { Chain } from 'viem';
 import { createConfig } from 'wagmi';
-import { createChains } from './chains';
+import { createWagmiTransports, getWagmiChains } from './aave-config';
 import type { Env } from './env';
 
 export function createWagmiConfig(env: Env) {
-  const { ENABLED_CHAINS, CHAINS } = createChains(env);
-
-  const chainsTuple = ENABLED_CHAINS as unknown as readonly [Chain, ...Chain[]];
+  const chains = getWagmiChains();
+  const transports = createWagmiTransports(env);
 
   return createConfig({
-    chains: chainsTuple,
-    transports: Object.fromEntries(Object.values(CHAINS).map((c) => [c.id, c.transport])),
+    chains,
+    transports,
     multiInjectedProviderDiscovery: true,
     ssr: false,
   });
