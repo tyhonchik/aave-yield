@@ -8,6 +8,8 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build:analyze": "ANALYZE=true next build",
+    "analyze": "ANALYZE=true next build && npx serve out",
     "start": "next start",
     "test": "vitest",
     "test:run": "vitest run",
@@ -20,7 +22,7 @@
     "check": "npm run type-check && npm run lint && npm run format:check && npm run secretlint",
     "fix": "npm run lint:fix && npm run format",
     "secretlint": "secretlint '**/*'",
-    "prepare": "husky"
+    "prepare": "husky || exit 0"
   },
   "dependencies": {
     "@bgd-labs/aave-address-book": "4.26.2",
@@ -45,6 +47,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@ianvs/prettier-plugin-sort-imports": "4.6.0",
+    "@next/bundle-analyzer": "15.4.6",
     "@secretlint/secretlint-rule-preset-recommend": "10.2.2",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "6.6.4",

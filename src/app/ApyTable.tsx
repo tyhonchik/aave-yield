@@ -1,7 +1,7 @@
 'use client';
 
 import { useAccount } from 'wagmi';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   ErrorState,
   LoadingState,
@@ -62,6 +62,13 @@ export default function ApyTable() {
   const { query, setQuery, filteredItems } = useTableFiltering(markets);
   const { sortKey, sortDir, sortedItems, toggleSort } = useTableSorting(filteredItems);
 
+  const handleRefresh = useCallback(() => refetch(), [refetch]);
+  const handleQueryChange = useCallback((newQuery: string) => setQuery(newQuery), [setQuery]);
+  const handleToggleAutoRefresh = useCallback(
+    () => setAutoRefreshEnabled(!autoRefreshEnabled),
+    [autoRefreshEnabled],
+  );
+
   useMemo(() => {
     if (marketErrors.length > 0 && markets.length > 0) {
       const errorCount = marketErrors.length;
@@ -85,11 +92,11 @@ export default function ApyTable() {
     <TooltipProvider>
       <TableControls
         query={query}
-        onQueryChange={setQuery}
-        onRefresh={() => refetch()}
+        onQueryChange={handleQueryChange}
+        onRefresh={handleRefresh}
         isFetching={isFetching}
         autoRefreshEnabled={autoRefreshEnabled}
-        onToggleAutoRefresh={() => setAutoRefreshEnabled(!autoRefreshEnabled)}
+        onToggleAutoRefresh={handleToggleAutoRefresh}
         lastUpdated={dataUpdatedAt}
         refreshInterval={QUERY_CONFIG.MARKETS_REFRESH_INTERVAL}
         staleTime={QUERY_CONFIG.MARKETS_STALE_TIME}
@@ -122,7 +129,7 @@ export default function ApyTable() {
                   key={error.id}
                   error={error}
                   isConnected={isConnected}
-                  onRetry={() => refetch()}
+                  onRetry={handleRefresh}
                 />
               ))}
               {sortedItems.length === 0 && marketErrors.length === 0 && (
@@ -158,7 +165,7 @@ export default function ApyTable() {
               key={error.id}
               error={error}
               isConnected={isConnected}
-              onRetry={() => refetch()}
+              onRetry={handleRefresh}
             />
           ))}
           {sortedItems.length === 0 && marketErrors.length === 0 && (

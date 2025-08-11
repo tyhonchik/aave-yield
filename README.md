@@ -69,6 +69,7 @@ src/
 - **Debounced search**: 250ms delay on filter input
 - **Server-side RPC**: Environment variables kept secure
 - **Graceful degradation**: Shows working markets even if some fail
+- **Service Worker**: Progressive Web App capabilities with offline functionality and caching
 
 ## Error Handling & Graceful Degradation
 

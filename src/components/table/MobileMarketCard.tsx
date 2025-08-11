@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { ChainIndicator, TokenIndicator } from '@/components/shared/icons';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -16,7 +17,7 @@ interface MobileMarketCardProps {
   balancesError?: Error & { code?: string; status?: number };
 }
 
-export function MobileMarketCard({
+export const MobileMarketCard = memo(function MobileMarketCard({
   reserve,
   isConnected,
   isBalancesFetching,
@@ -82,4 +83,4 @@ export function MobileMarketCard({
       </CardContent>
     </Card>
   );
-}
+});

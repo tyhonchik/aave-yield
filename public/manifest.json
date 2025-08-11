@@ -1,0 +1,19 @@
+{
+  "name": "Aave Supply Yield",
+  "short_name": "Aave Yield",
+  "description": "Real-time Aave V3 Supply APY tracker across multiple chains",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["finance", "utilities"],
+  "lang": "en-US"
+}

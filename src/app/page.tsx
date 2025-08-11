@@ -1,8 +1,30 @@
-import { ConnectWallet } from '@/components/shared/ConnectWallet';
+'use client';
+
+import { Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { AaveIcon } from '@/components/shared/icons';
-import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import ApyTable from './ApyTable';
+
+// Lazy load components that are not critical for initial render
+const ConnectWallet = dynamic(
+  () => import('@/components/shared/ConnectWallet').then((mod) => ({ default: mod.ConnectWallet })),
+  {
+    ssr: false,
+    loading: () => <div className="h-9 w-24 bg-muted animate-pulse rounded" />,
+  },
+);
+
+const ThemeToggle = dynamic(
+  () => import('@/components/shared/ThemeToggle').then((mod) => ({ default: mod.ThemeToggle })),
+  {
+    ssr: false,
+    loading: () => <div className="h-9 w-9 bg-muted animate-pulse rounded" />,
+  },
+);
+
+const ApyTable = dynamic(() => import('./ApyTable'), {
+  loading: () => <div className="h-96 bg-muted animate-pulse rounded" />,
+});
 
 export default function HomePage() {
   return (
@@ -21,8 +43,12 @@ export default function HomePage() {
               </div>
             </div>
             <div className="flex items-start justify-end gap-2">
-              <ConnectWallet />
-              <ThemeToggle />
+              <Suspense fallback={<div className="h-9 w-24 bg-muted animate-pulse rounded" />}>
+                <ConnectWallet />
+              </Suspense>
+              <Suspense fallback={<div className="h-9 w-9 bg-muted animate-pulse rounded" />}>
+                <ThemeToggle />
+              </Suspense>
             </div>
           </div>
 
@@ -40,13 +66,19 @@ export default function HomePage() {
               </div>
             </div>
             <div className="flex items-start gap-2">
-              <ConnectWallet />
-              <ThemeToggle />
+              <Suspense fallback={<div className="h-9 w-24 bg-muted animate-pulse rounded" />}>
+                <ConnectWallet />
+              </Suspense>
+              <Suspense fallback={<div className="h-9 w-9 bg-muted animate-pulse rounded" />}>
+                <ThemeToggle />
+              </Suspense>
             </div>
           </div>
         </header>
 
-        <ApyTable />
+        <Suspense fallback={<div className="h-96 bg-muted animate-pulse rounded" />}>
+          <ApyTable />
+        </Suspense>
       </main>
     </TooltipProvider>
   );

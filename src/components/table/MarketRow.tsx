@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { ChainIndicator, TokenIndicator } from '@/components/shared/icons';
 import { Badge } from '@/components/ui/badge';
 import { TableCell, TableRow } from '@/components/ui/table';
@@ -16,7 +17,7 @@ interface MarketRowProps {
   balancesError?: Error & { code?: string; status?: number };
 }
 
-export function MarketRow({
+export const MarketRow = memo(function MarketRow({
   reserve,
   isConnected,
   isBalancesFetching,
@@ -65,4 +66,4 @@ export function MarketRow({
       )}
     </TableRow>
   );
-}
+});
